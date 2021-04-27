@@ -1,0 +1,10 @@
+version: "3.3"
+
+services:
+  urlshortener:
+    container_name: "urlshortener"
+    build: "."
+    ports:
+      - "8000:8000"
+    environment:
+      SERVE_REST_ADDRESS: ":8000"
