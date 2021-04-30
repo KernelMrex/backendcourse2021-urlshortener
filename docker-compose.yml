@@ -8,3 +8,8 @@ services:
       - "8000:8000"
     environment:
       SERVE_REST_ADDRESS: ":8000"
+      DATA_SOURCE_URL: "/app/mount/urlshortener.sqlite"
+      MIGRATION_FILE_PATH: "/app/migrations/init.sql"
+    volumes:
+    - "./mnt:/app/mount"
+    - "./migrations:/app/migrations"

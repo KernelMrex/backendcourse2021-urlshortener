@@ -8,5 +8,5 @@ type Redirect struct {
 }
 
 type RedirectRepository interface {
-	AddRedirect(key string, url *url.URL) error
+	AddRedirect(redirect *Redirect) error
 }

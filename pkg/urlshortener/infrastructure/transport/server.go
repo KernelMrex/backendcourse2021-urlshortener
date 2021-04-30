@@ -10,9 +10,9 @@ type Server struct {
 	redirectService      service.RedirectService
 }
 
-func NewServer(redirectQueryService query.RedirectQueryService, redirectService service.RedirectService) *Server {
+func NewServer(redirectService service.RedirectService) *Server {
 	return &Server{
-		redirectQueryService: redirectQueryService,
+		redirectQueryService: nil,
 		redirectService:      redirectService,
 	}
 }
