@@ -13,8 +13,9 @@ import (
 	"syscall"
 	"time"
 	"urlshortener/pkg/urlshortener/app/service"
-	"urlshortener/pkg/urlshortener/infrastructure/sqllite/migration"
-	"urlshortener/pkg/urlshortener/infrastructure/sqllite/repository"
+	"urlshortener/pkg/urlshortener/infrastructure/sqlite/migration"
+	"urlshortener/pkg/urlshortener/infrastructure/sqlite/query"
+	"urlshortener/pkg/urlshortener/infrastructure/sqlite/repository"
 	"urlshortener/pkg/urlshortener/infrastructure/transport"
 )
 
@@ -40,7 +41,9 @@ func main() {
 	redirectRepo := repository.NewRedirectRepository(conn)
 	redirectService := service.NewRedirectService(redirectRepo)
 
-	server := startServer(os.Getenv("SERVE_REST_ADDRESS"), transport.NewServer(redirectService))
+	redirectQueryService := query.NewRedirectQueryService(conn)
+
+	server := startServer(os.Getenv("SERVE_REST_ADDRESS"), transport.NewServer(redirectService, redirectQueryService))
 	waitForKillSignal(getKillSignalChan())
 	shutdownServer(server)
 }

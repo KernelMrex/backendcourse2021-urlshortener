@@ -2,13 +2,17 @@ package query
 
 import (
 	"errors"
-	"urlshortener/pkg/urlshortener/app/model"
+	"net/url"
 )
 
 var (
 	ErrRedirectNotFound = errors.New("redirect was not found")
 )
 
+type RedirectView struct {
+	Url *url.URL
+}
+
 type RedirectQueryService interface {
-	GetRedirectByKey(key string) (*model.Redirect, error)
+	GetRedirectByKey(key string) (*RedirectView, error)
 }

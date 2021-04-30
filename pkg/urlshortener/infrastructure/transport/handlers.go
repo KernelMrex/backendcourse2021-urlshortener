@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"urlshortener/pkg/urlshortener/app/query"
 )
 
 const (
@@ -35,8 +36,39 @@ type saveRedirectResponse struct {
 	ShortenUrl string `json:"shorten_url"`
 }
 
-func (server *Server) getRedirect(w http.ResponseWriter, _ *http.Request) {
-	w.WriteHeader(http.StatusNotImplemented)
+type getRedirectResponse struct {
+	RedirectUrl string `json:"redirect_url"`
+}
+
+func (server *Server) getRedirect(w http.ResponseWriter, r *http.Request) {
+	key, ok := mux.Vars(r)["key"]
+	if !ok {
+		if err := writeJSONResponse(w, errorResponse{Msg: "Invalid redirect key provided"}); err != nil {
+			log.Error(errors.Wrap(err, "could not write JSON response"))
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	redirect, err := server.redirectQueryService.GetRedirectByKey(key)
+	if err != nil {
+		if errors.Is(err, query.ErrRedirectNotFound) {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		log.Error(errors.Wrap(err, "could not get redirect by key"))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if err := writeJSONResponse(w, getRedirectResponse{
+		RedirectUrl: redirect.Url.String(),
+	}); err != nil {
+		log.Error(errors.Wrap(err, "could not write JSON response"))
+		w.WriteHeader(http.StatusInternalServerError)
+	}
 }
 
 func (server *Server) saveRedirect(w http.ResponseWriter, r *http.Request) {
